@@ -1,0 +1,39 @@
+# API
+fastapi
+uvicorn[standard]
+
+# LangGraph / LLM
+langgraph
+langchain-groq
+langchain-mcp-adapters
+
+# MCP
+fastmcp
+
+# Database
+sqlalchemy
+asyncpg
+alembic
+psycopg2-binary
+
+# Vector DB
+qdrant-client
+
+# RAG
+sentence-transformers
+langchain-community
+
+# Web search
+tavily-python
+
+# Reports
+reportlab
+python-docx
+
+# Auth
+python-jose[cryptography]
+passlib[bcrypt]
+
+# Config / Utils
+pydantic-settings
+python-multipart
