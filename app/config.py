@@ -40,5 +40,8 @@ class Settings(BaseSettings):
     # Log
     LOG_LEVEL: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
 
+    # MCP Server
+    TAVILY_SEARCH_MAX_RESULTS: int = 5
+
 
 settings = Settings()

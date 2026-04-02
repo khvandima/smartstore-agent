@@ -38,3 +38,5 @@ passlib[bcrypt]
 # Config / Utils
 pydantic-settings
 python-multipart
+
+httpx
