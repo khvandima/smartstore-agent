@@ -17,6 +17,7 @@ class Settings(BaseSettings):
 
     # База данных
     DATABASE_URL: str
+    TEST_DATABASE_URL: str = ""
     QDRANT_HOST: str
     QDRANT_PORT: int = 6333
     QDRANT_API_KEY: str = ""
