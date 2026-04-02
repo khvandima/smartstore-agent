@@ -1,6 +1,6 @@
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from sqlalchemy import ForeignKey, String, DateTime, Text
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 import uuid
 
@@ -19,8 +19,8 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(255), unique=True)
     hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc)
     )
 
     # Relationship — позволяет делать user.products
@@ -38,8 +38,8 @@ class Product(Base):
     category: Mapped[str] = mapped_column(String(255))
     description: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc)
     )
 
     # Relationship — позволяет делать product.user
@@ -59,8 +59,8 @@ class Report(Base):
     file_path: Mapped[str] = mapped_column(String(255))
     report_type: Mapped[str] = mapped_column(String(255))
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow
+        DateTime(timezone=True),
+        default=datetime.now(timezone.utc)
     )
 
     # Relationship — позволяет делать product.user
