@@ -4,13 +4,17 @@ from fastapi import APIRouter
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta, timezone
-from app.config import settings
 
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from app.db.models import User
 from app.schemas.user import UserCreate, UserResponse, UserLogin, TokenResponse
 from app.db.session import get_db
+
+from app.config import settings
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 pwd_context = CryptContext(schemes=["bcrypt"])
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -33,6 +37,7 @@ async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db
     existing_user = result.scalar_one_or_none()
 
     if existing_user:
+        logger.warning(f"Registration attempt with existing email: {user_data.email}")
         raise HTTPException(status_code=400, detail="User already exists")
 
     new_user = User(
@@ -44,6 +49,7 @@ async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db
     db.add(new_user)
     await db.commit()
     await db.refresh(new_user)
+    logger.info(f"New user registered: {new_user.email}")
 
     return UserResponse(id=new_user.id, email=new_user.email, created_at=new_user.created_at)
 
@@ -64,5 +70,5 @@ async def login_user(user_data: UserLogin, db: AsyncSession = Depends(get_db)) -
         )
 
     token = create_token(str(user_data.email))
-
+    logger.info(f"User logged in: {user_data.email}")
     return TokenResponse(access_token=token, token_type="bearer")

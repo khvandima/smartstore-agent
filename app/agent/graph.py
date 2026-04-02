@@ -4,6 +4,9 @@ from langchain_groq import ChatGroq
 
 from app.config import settings
 from app.agent.state import AgentState
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 llm = ChatGroq(
     api_key=settings.GROQ_API_KEY,
@@ -16,8 +19,16 @@ def build_graph(tools: list):
     tool_node = ToolNode(tools)
 
     def agent_node(state: AgentState) -> dict:
-        response = llm_with_tools.invoke(state['messages'])
-        return {'messages': [response]}
+        last_message = state['messages'][-1]
+        logger.info(f"Agent received message: {last_message.content[:100]}")
+
+        try:
+            response = llm_with_tools.invoke(state['messages'])
+            logger.info(f"Agent response ready, tool_calls: {len(response.tool_calls)}")
+            return {'messages': [response]}
+        except Exception as e:
+            logger.error(f"LLM error: {e}")
+            raise
 
     graph = StateGraph(AgentState)
 
