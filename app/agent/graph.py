@@ -3,6 +3,8 @@ from langgraph.graph import StateGraph
 from langchain_groq import ChatGroq
 from langchain_core.messages import SystemMessage
 
+from tenacity import retry, stop_after_attempt, wait_fixed
+
 from app.config import settings
 from app.agent.state import AgentState
 from app.logger import get_logger
@@ -20,6 +22,10 @@ def build_graph(tools: list):
     llm_with_tools = llm.bind_tools(tools)
     tool_node = ToolNode(tools)
 
+    @retry(stop=stop_after_attempt(3), wait=wait_fixed(1))
+    def invoke_with_retry(messages):
+        return llm_with_tools.invoke(messages)
+
     def agent_node(state: AgentState) -> dict:
         last_message = state['messages'][-1]
         logger.info(f"Agent received message: {last_message.content[:100]}")
@@ -27,7 +33,7 @@ def build_graph(tools: list):
         messages = [SystemMessage(content=SYSTEM_PROMPT)] + state['messages']
 
         try:
-            response = llm_with_tools.invoke(messages)
+            response = invoke_with_retry(messages)
             logger.info(f"Agent response ready, tool_calls: {len(response.tool_calls)}")
             return {'messages': [response]}
         except Exception as e:

@@ -4,6 +4,10 @@ from app.mcp.tools.tavily import tavily_search
 from app.mcp.tools.naver_datalab import  get_search_trends
 from app.mcp.tools.naver_shopping import search_products
 
+from app.logger import get_logger
+
+logger = get_logger(__name__)
+
 mcp = FastMCP('smartstore-advisor')
 
 @mcp.tool()
@@ -13,15 +17,16 @@ def search_web(query: str) -> str:
 
 
 @mcp.tool()
-async def search_naver_trends(keyword: str) -> str:
+async def naver_trends(keyword: str) -> str:
     """Get search trend data for a keyword from Naver DataLab."""
     result = await get_search_trends(keyword)
     return str(result)
 
 
 @mcp.tool()
-async def naver_shopping_search(keyword: str) -> str:
+async def naver_shopping(keyword: str) -> str:
     """Search for products on Naver Shopping for competitor analysis."""
+    logger.info(f"naver_shopping called with keyword: {keyword}")
     result = await search_products(keyword)
     return str(result)
 

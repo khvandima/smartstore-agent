@@ -1,5 +1,6 @@
 from fastapi import HTTPException, status, Depends
 from fastapi import APIRouter
+from fastapi.security import OAuth2PasswordRequestForm
 
 from passlib.context import CryptContext
 from jose import jwt
@@ -54,21 +55,41 @@ async def register_user(user_data: UserCreate, db: AsyncSession = Depends(get_db
     return UserResponse(id=new_user.id, email=new_user.email, created_at=new_user.created_at)
 
 
+# @router.post('/login')
+# async def login_user(user_data: UserLogin, db: AsyncSession = Depends(get_db)) -> TokenResponse:
+#     query = select(User).where(User.email == user_data.email)
+#     result = await db.execute(query)
+#     user = result.scalar_one_or_none()
+#     if not user:
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#         )
+#
+#     if not pwd_context.verify(user_data.password, user.hashed_password):
+#         raise HTTPException(
+#             status_code=status.HTTP_401_UNAUTHORIZED,
+#         )
+#
+#     token = create_token(str(user_data.email))
+#     logger.info(f"User logged in: {user_data.email}")
+#     return TokenResponse(access_token=token, token_type="bearer")
+
+
+
 @router.post('/login')
-async def login_user(user_data: UserLogin, db: AsyncSession = Depends(get_db)) -> TokenResponse:
-    query = select(User).where(User.email == user_data.email)
+async def login_user(
+        form_data: OAuth2PasswordRequestForm = Depends(),
+        db: AsyncSession = Depends(get_db)
+) -> TokenResponse:
+    query = select(User).where(User.email == form_data.username)
     result = await db.execute(query)
     user = result.scalar_one_or_none()
     if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-        )
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    if not pwd_context.verify(user_data.password, user.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-        )
+    if not pwd_context.verify(form_data.password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED)
 
-    token = create_token(str(user_data.email))
-    logger.info(f"User logged in: {user_data.email}")
+    token = create_token(str(user.email))
+    logger.info(f"User logged in: {user.email}")
     return TokenResponse(access_token=token, token_type="bearer")

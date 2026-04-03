@@ -14,6 +14,7 @@ async def get_mcp_tools():
             }
         })
         tools = await client.get_tools()
+        logger.info(f"Tool names: {[t.name for t in tools]}")
         logger.info(f"Connected to MCP server, tools loaded: {len(tools)}")
         return tools, client
     except Exception as e:
