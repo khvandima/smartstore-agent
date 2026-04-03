@@ -1,10 +1,12 @@
 from langgraph.prebuilt import ToolNode, tools_condition
 from langgraph.graph import StateGraph
 from langchain_groq import ChatGroq
+from langchain_core.messages import SystemMessage
 
 from app.config import settings
 from app.agent.state import AgentState
 from app.logger import get_logger
+from app.constants import SYSTEM_PROMPT
 
 logger = get_logger(__name__)
 
@@ -22,8 +24,10 @@ def build_graph(tools: list):
         last_message = state['messages'][-1]
         logger.info(f"Agent received message: {last_message.content[:100]}")
 
+        messages = [SystemMessage(content=SYSTEM_PROMPT)] + state['messages']
+
         try:
-            response = llm_with_tools.invoke(state['messages'])
+            response = llm_with_tools.invoke(messages)
             logger.info(f"Agent response ready, tool_calls: {len(response.tool_calls)}")
             return {'messages': [response]}
         except Exception as e:
