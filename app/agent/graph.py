@@ -12,13 +12,14 @@ from app.constants import SYSTEM_PROMPT
 
 logger = get_logger(__name__)
 
+
 llm = ChatGroq(
     api_key=settings.GROQ_API_KEY,
     model=settings.LLM_MODEL,
 )
 
 
-def build_graph(tools: list):
+def build_graph(tools: list, checkpointer=None):
     llm_with_tools = llm.bind_tools(tools)
     tool_node = ToolNode(tools)
 
@@ -50,4 +51,4 @@ def build_graph(tools: list):
     graph.add_conditional_edges('agent', tools_condition)
     graph.add_edge('tools', 'agent')
 
-    return graph.compile()
+    return graph.compile(checkpointer=checkpointer)

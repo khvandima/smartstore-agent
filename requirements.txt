@@ -6,6 +6,7 @@ uvicorn[standard]
 langgraph
 langchain-groq
 langchain-mcp-adapters
+langgraph-checkpoint-postgres==3.0.5
 
 # MCP
 fastmcp
@@ -40,3 +41,4 @@ pydantic-settings
 python-multipart
 
 httpx
+psycopg[binary]
