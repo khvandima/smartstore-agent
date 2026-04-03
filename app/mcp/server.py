@@ -24,3 +24,7 @@ async def naver_shopping_search(keyword: str) -> str:
     """Search for products on Naver Shopping for competitor analysis."""
     result = await search_products(keyword)
     return str(result)
+
+
+if __name__ == "__main__":
+    mcp.run(transport="sse", port=8001)

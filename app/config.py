@@ -42,6 +42,7 @@ class Settings(BaseSettings):
 
     # MCP Server
     TAVILY_SEARCH_MAX_RESULTS: int = 5
+    MCP_SERVER_URL: str = "http://localhost:8001/sse"
 
 
 settings = Settings()
