@@ -44,6 +44,7 @@ class Product(Base):
 
     # Relationship — позволяет делать product.user
     user: Mapped["User"] = relationship(back_populates="products")
+    reports: Mapped[list["Report"]] = relationship(back_populates="product")
 
 
 class Report(Base):
@@ -65,4 +66,4 @@ class Report(Base):
 
     # Relationship — позволяет делать product.user
     user: Mapped["User"] = relationship(back_populates="reports")
-    product: Mapped[Optional["Product"]] = relationship()
+    product: Mapped[Optional["Product"]] = relationship(back_populates="reports")

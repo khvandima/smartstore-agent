@@ -17,7 +17,7 @@ class Settings(BaseSettings):
 
     # База данных
     DATABASE_URL: str
-    TEST_DATABASE_URL: str = ""
+    TEST_DATABASE_URL: str = "postgresql://naver_user:naver_password@localhost:5432/naver_advisor_test"
     QDRANT_HOST: str
     QDRANT_PORT: int = 6333
     QDRANT_API_KEY: str = ""
@@ -33,6 +33,7 @@ class Settings(BaseSettings):
     CHUNK_OVERLAP: int = 100
     VECTOR_SIZE: int = 1024
     RERANK_MODEL: str = 'cross-encoder/ms-marco-MiniLM-L-6-v2'
+    TOP_K: int = 5
 
     # LLM
     LLM_MODEL: str = 'llama-3.3-70b-versatile'

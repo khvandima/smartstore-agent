@@ -6,6 +6,8 @@ uvicorn[standard]
 langgraph
 langchain-groq
 langchain-mcp-adapters
+langchain-text-splitters
+langchain_huggingface
 langgraph-checkpoint-postgres==3.0.5
 
 # MCP
@@ -39,6 +41,9 @@ passlib[bcrypt]
 # Config / Utils
 pydantic-settings
 python-multipart
+
+# Pandas
+pandas
 
 httpx
 psycopg[binary]

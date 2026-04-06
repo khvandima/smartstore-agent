@@ -5,11 +5,23 @@ from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker, Asyn
 
 from app.main import app
 from app.db.session import get_db
+from app.db.models import Base
 from app.config import settings
 
 
 def get_test_engine():
     return create_async_engine(settings.TEST_DATABASE_URL)
+
+
+@pytest.fixture(scope="session", autouse=True)
+async def setup_db():
+    engine = create_async_engine(settings.TEST_DATABASE_URL)
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+    yield
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.drop_all)
+    await engine.dispose()
 
 
 @pytest.fixture
@@ -32,11 +44,10 @@ def client():
 
 
 @pytest.fixture(autouse=True)
-def clean_db():
+def clean_db(setup_db):
     yield
-    conn = psycopg2.connect(
-        "postgresql://naver_user:naver_password@localhost:5432/naver_advisor_test"
-    )
+    conn_string = settings.TEST_DATABASE_URL.replace("postgresql+asyncpg://", "postgresql://")
+    conn = psycopg2.connect(conn_string)
     conn.autocommit = True
     cur = conn.cursor()
     cur.execute("TRUNCATE users, products, reports CASCADE")
