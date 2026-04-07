@@ -47,3 +47,5 @@ pandas
 
 httpx
 psycopg[binary]
+
+openpyxl
