@@ -9,6 +9,7 @@ from app.agent.mcp_client import get_mcp_tools
 from app.api.routes.auth import router as auth_router
 from app.api.routes.chat import router as chat_router
 from app.api.routes.documents import router as documents_router
+from app.api.routes.reports import router as reports_router
 from app.db.checkpointer import init_checkpointer, close_checkpointer
 from app.config import settings
 
@@ -33,3 +34,4 @@ app = FastAPI(title="SmartStore AI Advisor", lifespan=lifespan)
 app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(documents_router)
+app.include_router(reports_router)

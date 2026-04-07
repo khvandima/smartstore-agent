@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- КАРТОЧКИ СО СТАТИСТИКОЙ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Ключевое слово</div>
+        <div class="stat-value" style="font-size: 14pt; font-family: 'Noto Sans KR'">{{ data.keyword }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Конкурентов найдено</div>
+        <div class="stat-value">{{ data.competitors | length }}</div>
+        <div class="stat-unit">товаров в выдаче</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Пик спроса</div>
+        <div class="stat-value positive">{{ peak_value }}</div>
+        <div class="stat-unit">индекс поиска (макс.)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Средняя цена</div>
+        <div class="stat-value">{{ avg_price | int }}</div>
+        <div class="stat-unit">Korean Won (₩)</div>
+    </div>
+</div>
+
+<!-- ГРАФИК ТРЕНДОВ -->
+<div class="section">
+    <div class="section-title">Тренд поискового спроса</div>
+    <div class="chart-container">
+        <div class="chart-title">Индекс поиска по месяцам (Naver DataLab)</div>
+        <img src="{{ trend_chart }}" alt="Тренд спроса">
+    </div>
+</div>
+
+<!-- ТАБЛИЦА КОНКУРЕНТОВ -->
+<div class="section">
+    <div class="section-title">Топ конкуренты</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Название товара</th>
+            <th>Цена (₩)</th>
+            <th>Отзывы</th>
+            <th>Ссылка</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in data.competitors %}
+        <tr>
+            <td>
+                {% if loop.index == 1 %}
+                <span class="rank-badge">1</span>
+                {% elif loop.index == 2 %}
+                <span class="rank-badge silver">2</span>
+                {% elif loop.index == 3 %}
+                <span class="rank-badge bronze">3</span>
+                {% else %}
+                {{ loop.index }}
+                {% endif %}
+            </td>
+            <td>{{ c.name }}</td>
+            <td class="mono">{{ "{:,}".format(c.price) }} ₩</td>
+            <td class="mono">{{ "{:,}".format(c.reviews) }}</td>
+            <td>
+                {% if c.link %}
+                <a href="{{ c.link }}" style="color: var(--accent); font-size: 8.5pt;">перейти →</a>
+                {% else %}
+                —
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- СРАВНЕНИЕ ЦЕН -->
+<div class="section">
+    <div class="section-title">Сравнение цен конкурентов</div>
+    {% set max_price = data.competitors | map(attribute='price') | max %}
+    {% for c in data.competitors %}
+    <div class="price-bar-row">
+        <div class="price-bar-label">{{ c.name[:20] }}{% if c.name|length > 20 %}…{% endif %}</div>
+        <div class="price-bar-track">
+            <div class="price-bar-fill" style="width: {{ (c.price / max_price * 100) | int }}%"></div>
+        </div>
+        <div class="price-bar-value">{{ "{:,}".format(c.price) }} ₩</div>
+    </div>
+    {% endfor %}
+</div>
+
+<hr class="divider">
+
+<!-- ВЫВОД АГЕНТА -->
+<div class="section">
+    <div class="section-title">Аналитический вывод</div>
+    <div class="summary-box">
+        <p>{{ data.summary }}</p>
+    </div>
+</div>
+
+{% endblock %}

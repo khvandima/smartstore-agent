@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ title }} — SmartStore AI Advisor</title>
+    <link rel="stylesheet" href="{{ css_path }}">
+</head>
+<body>
+
+<!-- ШАПКА -->
+<div class="report-header">
+    <div class="header-top">
+        <div class="brand">
+            <div class="brand-icon">S</div>
+            <div>
+                <div class="brand-name">SmartStore AI Advisor</div>
+                <div class="brand-sub">Naver Market Intelligence</div>
+            </div>
+        </div>
+        <div class="report-meta">
+            <strong>{{ generated_at }}</strong><br>
+            отчёт сгенерирован автоматически<br>
+            на основе данных Naver DataLab & Shopping
+        </div>
+    </div>
+    <div class="report-title-block">
+        <div class="report-badge">{{ report_type_label }}</div>
+        <div class="report-title">{{ title }}</div>
+    </div>
+</div>
+
+<!-- КОНТЕНТ — каждый шаблон заполняет этот блок -->
+<div class="report-body">
+    {% block content %}{% endblock %}
+</div>
+
+<!-- ПОДВАЛ -->
+<div class="report-footer">
+    <div class="footer-brand">SmartStore AI Advisor</div>
+    <div class="footer-disclaimer">
+        Данные получены из Naver DataLab и Naver Shopping API.<br>
+        Отчёт носит аналитический характер и не является финансовой рекомендацией.
+    </div>
+    <div class="footer-page">{{ generated_at }}</div>
+</div>
+
+</body>
+</html>

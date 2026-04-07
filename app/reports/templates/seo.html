@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- КАРТОЧКИ СО СТАТИСТИКОЙ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Ключевых слов</div>
+        <div class="stat-value positive">{{ data.keywords | length }}</div>
+        <div class="stat-unit">рекомендовано</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Длина нового заголовка</div>
+        <div class="stat-value">{{ data.new_title | length }}</div>
+        <div class="stat-unit">символов</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Длина нового описания</div>
+        <div class="stat-value">{{ data.new_description | length }}</div>
+        <div class="stat-unit">символов</div>
+    </div>
+</div>
+
+<!-- ЗАГОЛОВОК: ДО И ПОСЛЕ -->
+<div class="section">
+    <div class="section-title">Заголовок товара</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th style="width: 50%">До</th>
+            <th style="width: 50%">После</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr>
+            <td style="color: var(--text-muted)">{{ data.original_title }}</td>
+            <td style="color: var(--success); font-weight: 500">{{ data.new_title }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<!-- КЛЮЧЕВЫЕ СЛОВА -->
+<div class="section">
+    <div class="section-title">Рекомендуемые ключевые слова</div>
+    <div class="keyword-tags">
+        {% for kw in data.keywords %}
+        <span class="keyword-tag">{{ kw }}</span>
+        {% endfor %}
+    </div>
+</div>
+
+<hr class="divider">
+
+<!-- ОПИСАНИЕ: ДО -->
+<div class="section">
+    <div class="section-title">Исходное описание</div>
+    <div class="summary-box" style="border-left-color: var(--text-muted); background: var(--surface)">
+        <p style="color: var(--text-muted)">{{ data.original_description }}</p>
+    </div>
+</div>
+
+<!-- ОПИСАНИЕ: ПОСЛЕ -->
+<div class="section">
+    <div class="section-title">Оптимизированное описание</div>
+    <div class="summary-box">
+        <p>{{ data.new_description }}</p>
+    </div>
+</div>
+
+{% endblock %}

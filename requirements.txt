@@ -48,4 +48,10 @@ pandas
 httpx
 psycopg[binary]
 
+# XLSX file test
 openpyxl
+
+# Reports generator
+weasyprint
+jinja2
+matplotlib

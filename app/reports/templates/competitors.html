@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- КАРТОЧКИ СО СТАТИСТИКОЙ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Конкурентов</div>
+        <div class="stat-value">{{ data.competitors | length }}</div>
+        <div class="stat-unit">в выдаче</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Средняя цена рынка</div>
+        <div class="stat-value">{{ "{:,}".format(data.avg_price) }}</div>
+        <div class="stat-unit">Korean Won (₩)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Минимальная цена</div>
+        <div class="stat-value positive">{{ "{:,}".format(data.min_price) }}</div>
+        <div class="stat-unit">Korean Won (₩)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Максимальная цена</div>
+        <div class="stat-value warning">{{ "{:,}".format(data.max_price) }}</div>
+        <div class="stat-unit">Korean Won (₩)</div>
+    </div>
+</div>
+
+<!-- ГРАФИК ЦЕН -->
+<div class="section">
+    <div class="section-title">Распределение цен конкурентов</div>
+    <div class="chart-container">
+        <div class="chart-title">Топ-10 конкурентов по цене (₩)</div>
+        <img src="{{ price_chart }}" alt="Цены конкурентов">
+    </div>
+</div>
+
+<!-- ТАБЛИЦА КОНКУРЕНТОВ -->
+<div class="section">
+    <div class="section-title">Детальный список конкурентов</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Название товара</th>
+            <th>Цена (₩)</th>
+            <th>Отзывы</th>
+            <th>Ссылка</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in data.competitors %}
+        <tr>
+            <td>
+                {% if loop.index == 1 %}
+                <span class="rank-badge">1</span>
+                {% elif loop.index == 2 %}
+                <span class="rank-badge silver">2</span>
+                {% elif loop.index == 3 %}
+                <span class="rank-badge bronze">3</span>
+                {% else %}
+                {{ loop.index }}
+                {% endif %}
+            </td>
+            <td>{{ c.name }}</td>
+            <td class="mono">{{ "{:,}".format(c.price) }} ₩</td>
+            <td class="mono">{{ "{:,}".format(c.reviews) }}</td>
+            <td>
+                {% if c.link %}
+                <a href="{{ c.link }}" style="color: var(--accent); font-size: 8.5pt;">перейти →</a>
+                {% else %}
+                —
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- СРАВНЕНИЕ ЦЕН — ПРОГРЕСС-БАРЫ -->
+<div class="section">
+    <div class="section-title">Визуальное сравнение цен</div>
+    {% set max_price = data.competitors | map(attribute='price') | max %}
+    {% for c in data.competitors %}
+    <div class="price-bar-row">
+        <div class="price-bar-label">{{ c.name[:20] }}{% if c.name|length > 20 %}…{% endif %}</div>
+        <div class="price-bar-track">
+            <div class="price-bar-fill {{ 'highlight' if c.price == max_price }}"
+                 style="width: {{ (c.price / max_price * 100) | int }}%"></div>
+        </div>
+        <div class="price-bar-value">{{ "{:,}".format(c.price) }} ₩</div>
+    </div>
+    {% endfor %}
+</div>
+
+<hr class="divider">
+
+<!-- ВЫВОД -->
+<div class="section">
+    <div class="section-title">Аналитический вывод</div>
+    <div class="summary-box">
+        <p>{{ data.summary }}</p>
+    </div>
+</div>
+
+{% endblock %}

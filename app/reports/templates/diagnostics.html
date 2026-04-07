@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- КАРТОЧКИ СО СТАТИСТИКОЙ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Ваша цена</div>
+        <div class="stat-value">{{ "{:,}".format(data.product_price) }}</div>
+        <div class="stat-unit">Korean Won (₩)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Средняя цена конкурентов</div>
+        <div class="stat-value {{ 'negative' if data.product_price > data.avg_competitor_price else 'positive' }}">
+            {{ "{:,}".format(data.avg_competitor_price) }}
+        </div>
+        <div class="stat-unit">Korean Won (₩)</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Разница в цене</div>
+        {% set diff = data.product_price - data.avg_competitor_price %}
+        <div class="stat-value {{ 'negative' if diff > 0 else 'positive' }}">
+            {{ '+' if diff > 0 else '' }}{{ "{:,}".format(diff) }}
+        </div>
+        <div class="stat-unit">₩ от среднего</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Выявлено проблем</div>
+        <div class="stat-value warning">{{ data.problems | length }}</div>
+        <div class="stat-unit">требуют внимания</div>
+    </div>
+</div>
+
+<!-- СРАВНЕНИЕ ЦЕН -->
+<div class="section">
+    <div class="section-title">Сравнение цен</div>
+    <div class="chart-container">
+        <div class="chart-title">Ваша цена vs средняя цена конкурентов</div>
+        <img src="{{ price_chart }}" alt="Сравнение цен">
+    </div>
+</div>
+
+<!-- ТРЕНД СПРОСА -->
+<div class="section">
+    <div class="section-title">Тренд поискового спроса</div>
+    <div class="chart-container">
+        <div class="chart-title">Динамика спроса за последние 12 месяцев</div>
+        <img src="{{ trend_chart }}" alt="Тренд спроса">
+    </div>
+</div>
+
+<hr class="divider">
+
+<!-- ПРОБЛЕМЫ -->
+<div class="section">
+    <div class="section-title">Выявленные проблемы</div>
+    <ul class="insight-list problems">
+        {% for problem in data.problems %}
+        <li>{{ problem }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<!-- РЕКОМЕНДАЦИИ -->
+<div class="section">
+    <div class="section-title">Рекомендации</div>
+    <ul class="insight-list recommendations">
+        {% for rec in data.recommendations %}
+        <li>{{ rec }}</li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

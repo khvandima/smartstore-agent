@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<!-- КАРТОЧКИ СО СТАТИСТИКОЙ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-label">Ключевое слово</div>
+        <div class="stat-value" style="font-size: 14pt; font-family: 'Noto Sans KR'">{{ data.keyword }}</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Пиковые месяцы</div>
+        <div class="stat-value positive">{{ data.peak_months | join(', ') }}</div>
+        <div class="stat-unit">месяц(ы) года</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Период анализа</div>
+        <div class="stat-value">{{ data.trends | length }}</div>
+        <div class="stat-unit">месяцев данных</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-label">Макс. индекс спроса</div>
+        <div class="stat-value positive">{{ (data.trends | map(attribute='value') | max) | int }}</div>
+        <div class="stat-unit">из 100</div>
+    </div>
+</div>
+
+<!-- ГРАФИК ТРЕНДОВ -->
+<div class="section">
+    <div class="section-title">Сезонный тренд спроса</div>
+    <div class="chart-container">
+        <div class="chart-title">Индекс поиска по месяцам — выявление сезонности</div>
+        <img src="{{ trend_chart }}" alt="Сезонный тренд">
+    </div>
+</div>
+
+<!-- ДИНАМИКА ЦЕН КОНКУРЕНТОВ -->
+{% if data.price_dynamics %}
+<div class="section">
+    <div class="section-title">Динамика цен конкурентов</div>
+    <table class="data-table">
+        <thead>
+        <tr>
+            <th>#</th>
+            <th>Товар</th>
+            <th>Цена (₩)</th>
+            <th>Отзывы</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for c in data.price_dynamics %}
+        <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ c.name }}</td>
+            <td class="mono">{{ "{:,}".format(c.price) }} ₩</td>
+            <td class="mono">{{ "{:,}".format(c.reviews) }}</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endif %}
+
+<hr class="divider">
+
+<!-- РЕКОМЕНДАЦИИ -->
+<div class="section">
+    <div class="section-title">Рекомендации по сезонности</div>
+    <div class="summary-box">
+        <p>{{ data.recommendations }}</p>
+    </div>
+</div>
+
+{% endblock %}
