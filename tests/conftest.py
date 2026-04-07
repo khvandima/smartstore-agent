@@ -53,3 +53,17 @@ def clean_db(setup_db):
     cur.execute("TRUNCATE users, products, reports CASCADE")
     cur.close()
     conn.close()
+
+
+@pytest.fixture
+def auth_token(client: TestClient) -> str:
+    """Регистрирует пользователя и возвращает JWT токен."""
+    payload = {"email": "test@example.com", "password": "password123"}
+    client.post("/auth/register", json=payload)
+
+    from fastapi.testclient import TestClient
+    response = client.post(
+        "/auth/login",
+        data={"username": "test@example.com", "password": "password123"}
+    )
+    return response.json()["access_token"]

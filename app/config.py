@@ -45,5 +45,10 @@ class Settings(BaseSettings):
     TAVILY_SEARCH_MAX_RESULTS: int = 5
     MCP_SERVER_URL: str = "http://localhost:8001/sse"
 
+    REPORTS_DIR: str = "reports"
+
+    MAX_MESSAGES_BEFORE_SUMMARY: int = 20  # порог
+    SUMMARY_KEEP_LAST: int = 6             # сколько последних сообщений оставить
+
 
 settings = Settings()

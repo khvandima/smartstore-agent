@@ -327,6 +327,7 @@ async function uploadFile(file) {
 
     try {
         fillEl.style.width = '60%';
+        labelEl.textContent = `Индексирование ${file.name} в базу знаний...`;
 
         const res = await fetch(`${API_BASE}/documents/upload`, {
             method: 'POST',
@@ -335,6 +336,7 @@ async function uploadFile(file) {
         });
 
         fillEl.style.width = '100%';
+        labelEl.textContent = `Готово!`;
 
         if (!res.ok) {
             const data = await res.json();
@@ -431,7 +433,8 @@ async function generateReport() {
     btnGenerate.textContent = 'Генерация...';
 
     // Просим агента собрать данные и сгенерировать отчёт
-    const prompt = `Сгенерируй отчёт типа ${currentReportType} для ключевого слова "${keyword}". Собери все необходимые данные из Naver и верни структурированный JSON для генерации PDF отчёта.`;
+    // const prompt = `Сгенерируй отчёт типа ${currentReportType} для ключевого слова "${keyword}". Собери все необходимые данные из Naver и верни структурированный JSON для генерации PDF отчёта.`;
+    const prompt = `Используй инструмент generate_report чтобы создать отчёт типа ${currentReportType} для ключевого слова "${keyword}". Переведи ключевое слово на корейский если нужно.`;
 
     try {
         // Отправляем запрос агенту
@@ -458,7 +461,19 @@ async function generateReport() {
         hideTyping();
         addMessage(chatData.response, 'agent');
 
-        showToast('Для скачивания PDF используйте /reports/generate API', 'success');
+        const response = chatData.response;
+        const match = response.match(/\/reports-files\/[\w\-\.]+\.pdf/);
+        if (match) {
+            const a = document.createElement('a');
+            a.href = match[0];
+            a.download = match[0].split('/').pop();
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            showToast('PDF отчёт скачивается...', 'success');
+        } else {
+            showToast('Агент собирает данные. Попробуйте ещё раз.', 'default');
+        }
 
     } catch (e) {
         errorEl.textContent = 'Ошибка подключения к серверу';
