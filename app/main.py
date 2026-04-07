@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
+from qdrant_client import AsyncQdrantClient
+
 from sentence_transformers import SentenceTransformer, CrossEncoder
 from app.rag.reranker import Reranker
 from app.agent.mcp_client import get_mcp_tools
@@ -18,6 +20,10 @@ async def lifespan(app: FastAPI):
     app.state.tools = tools
     app.state.embedding_model = SentenceTransformer(settings.EMBEDDING_MODEL)
     app.state.reranker = Reranker(model=CrossEncoder(settings.RERANK_MODEL))
+    app.state.qdrant = AsyncQdrantClient(
+        host=settings.QDRANT_HOST,
+        port=settings.QDRANT_PORT,
+    )
     yield
     await close_checkpointer()
     await client.close()

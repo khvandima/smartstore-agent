@@ -6,9 +6,8 @@ from pathlib import Path
 from docx import Document
 import pandas as pd
 
-from qdrant_client.models import Filter, FieldCondition, MatchValue
+from qdrant_client.models import Filter, FieldCondition, MatchValue, VectorParams, Distance, PointStruct
 from qdrant_client import AsyncQdrantClient
-from qdrant_client.models import VectorParams, Distance, PointStruct
 from sentence_transformers import SentenceTransformer
 
 from app.config import settings
@@ -17,17 +16,14 @@ from app.logger import get_logger
 logger = get_logger(__name__)
 
 class DocumentIngester:
-    def __init__(self, content: bytes, filename: str, user_id: str, embedding_model: SentenceTransformer):
+    def __init__(self, content: bytes, filename: str, user_id: str, embedding_model: SentenceTransformer, qdrant: AsyncQdrantClient):
+        self.qdrant = qdrant
         self.content = content
         self.filename = filename
         self.user_id = user_id
         self.splitter = RecursiveCharacterTextSplitter(
             chunk_size=settings.CHUNK_SIZE,
             chunk_overlap=settings.CHUNK_OVERLAP,
-        )
-        self.qdrant = AsyncQdrantClient(
-            host=settings.QDRANT_HOST,
-            port=settings.QDRANT_PORT,
         )
         self.embeddings = embedding_model
 

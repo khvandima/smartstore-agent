@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from sentence_transformers import SentenceTransformer
 
 from io import BytesIO
@@ -46,15 +46,15 @@ def test_rerank_sorted_by_score():
 
 def test_load_txt():
     """Test that _load_txt correctly decodes bytes content to a list with one string."""
-    with patch('app.rag.ingestion.AsyncQdrantClient'):
-        ingester = DocumentIngester(
-            content=b"hello world",
-            filename="test.txt",
-            user_id="test_user",
-            embedding_model=MagicMock(spec=SentenceTransformer)
-        )
-        result = ingester._load_txt()
-        assert result == ["hello world"]
+    ingester = DocumentIngester(
+        content=b"hello world",
+        filename="test.txt",
+        user_id="test_user",
+        embedding_model=MagicMock(spec=SentenceTransformer),
+        qdrant=MagicMock()
+    )
+    result = ingester._load_txt()
+    assert result == ["hello world"]
 
 
 def test_load_docx():
@@ -66,15 +66,15 @@ def test_load_docx():
     buf = BytesIO()
     doc.save(buf)
     sample = buf.getvalue()
-    with patch('app.rag.ingestion.AsyncQdrantClient'):  # ← обязательно
-        ingester = DocumentIngester(
-            content=sample,
-            filename="test.docx",
-            user_id="test_user",
-            embedding_model=MagicMock(spec=SentenceTransformer)
-        )
-        result = ingester._load_docx()
-        assert result == ["paragraph_1", "paragraph_2", "paragraph_3"]
+    ingester = DocumentIngester(
+        content=sample,
+        filename="test.docx",
+        user_id="test_user",
+        embedding_model=MagicMock(spec=SentenceTransformer),
+        qdrant=MagicMock()
+    )
+    result = ingester._load_docx()
+    assert result == ["paragraph_1", "paragraph_2", "paragraph_3"]
 
 
 def test_load_xlsx():
@@ -86,28 +86,28 @@ def test_load_xlsx():
     buf = BytesIO()
     wb.save(buf)
     sample = buf.getvalue()
-    with patch('app.rag.ingestion.AsyncQdrantClient'):  # ← обязательно
-        ingester = DocumentIngester(
-            content=sample,
-            filename="test.xlsx",
-            user_id="test_user",
-            embedding_model=MagicMock(spec=SentenceTransformer)
-        )
-        result = ingester._load_xlsx()
-        assert len(result) == 1
-        assert "Phone case" in result[0]
-        assert "100" in result[0]
+    ingester = DocumentIngester(
+        content=sample,
+        filename="test.xlsx",
+        user_id="test_user",
+        embedding_model=MagicMock(spec=SentenceTransformer),
+        qdrant=MagicMock()
+    )
+    result = ingester._load_xlsx()
+    assert len(result) == 1
+    assert "Phone case" in result[0]
+    assert "100" in result[0]
 
 
 @pytest.mark.asyncio
 async def test_ingest_unsupported_type():
     """Test that ingest raises ValueError for unsupported file extensions."""
-    with patch('app.rag.ingestion.AsyncQdrantClient'):
-        ingester = DocumentIngester(
-            content=b"data",
-            filename="file.pdf",
-            user_id="test_user",
-            embedding_model=MagicMock(spec=SentenceTransformer)
-        )
-        with pytest.raises(ValueError):
-            await ingester.ingest()
+    ingester = DocumentIngester(
+        content=b"data",
+        filename="file.pdf",
+        user_id="test_user",
+        embedding_model=MagicMock(spec=SentenceTransformer),
+        qdrant=MagicMock()
+    )
+    with pytest.raises(ValueError):
+        await ingester.ingest()
