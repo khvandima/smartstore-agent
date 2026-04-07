@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartStore AI Advisor</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=DM+Serif+Display&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body>
+
+<!-- ─── ЭКРАН ВХОДА ─── -->
+<div id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+        <div class="auth-logo">
+            <div class="brand-icon">S</div>
+            <div>
+                <div class="brand-name">SmartStore AI</div>
+                <div class="brand-sub">Naver Market Intelligence</div>
+            </div>
+        </div>
+
+        <div id="auth-tabs" class="auth-tabs">
+            <button class="auth-tab active" onclick="switchAuthTab('login')">Войти</button>
+            <button class="auth-tab" onclick="switchAuthTab('register')">Регистрация</button>
+        </div>
+
+        <!-- Форма входа -->
+        <div id="login-form" class="auth-form">
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="login-email" placeholder="you@example.com">
+            </div>
+            <div class="field-group">
+                <label>Пароль</label>
+                <input type="password" id="login-password" placeholder="••••••••">
+            </div>
+            <div id="login-error" class="auth-error hidden"></div>
+            <button class="btn-primary" onclick="login()">Войти</button>
+        </div>
+
+        <!-- Форма регистрации -->
+        <div id="register-form" class="auth-form hidden">
+            <div class="field-group">
+                <label>Email</label>
+                <input type="email" id="reg-email" placeholder="you@example.com">
+            </div>
+            <div class="field-group">
+                <label>Пароль</label>
+                <input type="password" id="reg-password" placeholder="Минимум 8 символов">
+            </div>
+            <div id="register-error" class="auth-error hidden"></div>
+            <button class="btn-primary" onclick="register()">Создать аккаунт</button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── ОСНОВНОЕ ПРИЛОЖЕНИЕ ─── -->
+<div id="app" class="app hidden">
+
+    <!-- БОКОВАЯ ПАНЕЛЬ -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="brand-icon">S</div>
+            <div>
+                <div class="brand-name">SmartStore AI</div>
+                <div class="brand-sub">Naver Market Intelligence</div>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <button class="nav-item active" onclick="switchTab('chat')" id="nav-chat">
+                <span class="nav-icon">💬</span>
+                <span>Чат с агентом</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('documents')" id="nav-documents">
+                <span class="nav-icon">📁</span>
+                <span>Мои документы</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('reports')" id="nav-reports">
+                <span class="nav-icon">📊</span>
+                <span>Отчёты</span>
+            </button>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-info">
+                <div class="user-avatar" id="user-avatar">U</div>
+                <div class="user-email" id="user-email">user@example.com</div>
+            </div>
+            <button class="btn-logout" onclick="logout()" title="Выйти">↩</button>
+        </div>
+    </aside>
+
+    <!-- ОСНОВНАЯ ОБЛАСТЬ -->
+    <main class="main-content">
+
+        <!-- ─── ЧАТ ─── -->
+        <section id="tab-chat" class="tab-section active">
+            <div class="chat-header">
+                <div>
+                    <h1 class="page-title">Чат с агентом</h1>
+                    <p class="page-subtitle">Задайте вопрос о нише, конкурентах или трендах</p>
+                </div>
+                <button class="btn-secondary" onclick="newSession()" title="Новый диалог">
+                    + Новый диалог
+                </button>
+            </div>
+
+            <div class="chat-messages" id="chat-messages">
+                <div class="message agent">
+                    <div class="message-avatar">AI</div>
+                    <div class="message-bubble">
+                        Привет! Я SmartStore AI Advisor. Помогу вам анализировать ниши, конкурентов и тренды на Naver Smart Store.<br><br>
+                        Попробуйте спросить:<br>
+                        • <em>«Проанализируй нишу термосов на Naver»</em><br>
+                        • <em>«Почему плохо продаются мои товары?»</em><br>
+                        • <em>«Какая сезонность у зонтов?»</em>
+                    </div>
+                </div>
+            </div>
+
+            <div class="chat-input-area">
+                <div class="chat-input-wrapper">
+                    <textarea
+                            id="chat-input"
+                            placeholder="Задайте вопрос агенту..."
+                            rows="1"
+                            onkeydown="handleChatKey(event)"
+                            oninput="autoResize(this)"
+                    ></textarea>
+                    <button class="btn-send" onclick="sendMessage()" id="btn-send">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
+                <div class="chat-hint">Enter — отправить · Shift+Enter — новая строка</div>
+            </div>
+        </section>
+
+        <!-- ─── ДОКУМЕНТЫ ─── -->
+        <section id="tab-documents" class="tab-section">
+            <div class="section-header">
+                <div>
+                    <h1 class="page-title">Мои документы</h1>
+                    <p class="page-subtitle">Загрузите файлы для персонализированного анализа</p>
+                </div>
+            </div>
+
+            <!-- Зона загрузки -->
+            <div class="upload-zone" id="upload-zone"
+                 ondragover="handleDragOver(event)"
+                 ondragleave="handleDragLeave(event)"
+                 ondrop="handleDrop(event)"
+                 onclick="document.getElementById('file-input').click()">
+                <div class="upload-icon">📂</div>
+                <div class="upload-title">Перетащите файл или нажмите для выбора</div>
+                <div class="upload-hint">Поддерживаются: .txt, .docx, .doc, .xlsx, .xls · Размер файла не должен превышать 10MB</div>
+                <input type="file" id="file-input" accept=".txt,.docx,.doc,.xlsx,.xls"
+                       style="display:none" onchange="uploadFile(this.files[0])">
+            </div>
+
+            <!-- Прогресс загрузки -->
+            <div id="upload-progress" class="upload-progress hidden">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-label" id="progress-label">Загрузка...</div>
+            </div>
+
+            <!-- Список документов -->
+            <div class="documents-section">
+                <div class="section-title-small">Загруженные документы</div>
+                <div id="documents-list" class="documents-list">
+                    <div class="empty-state">Документы не загружены</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ─── ОТЧЁТЫ ─── -->
+        <section id="tab-reports" class="tab-section">
+            <div class="section-header">
+                <div>
+                    <h1 class="page-title">Генерация отчётов</h1>
+                    <p class="page-subtitle">Создайте PDF-отчёт на основе данных Naver</p>
+                </div>
+            </div>
+
+            <div class="reports-grid">
+
+                <!-- Анализ ниши -->
+                <div class="report-card" onclick="openReportModal('niche_analysis')">
+                    <div class="report-card-icon">🔍</div>
+                    <div class="report-card-title">Анализ ниши</div>
+                    <div class="report-card-desc">Тренды спроса, топ конкуренты, средние цены</div>
+                    <div class="report-card-badge">DataLab + Shopping</div>
+                </div>
+
+                <!-- Диагностика -->
+                <div class="report-card" onclick="openReportModal('diagnostics')">
+                    <div class="report-card-icon">🩺</div>
+                    <div class="report-card-title">Диагностика продаж</div>
+                    <div class="report-card-desc">Почему плохо продаётся? Проблемы и рекомендации</div>
+                    <div class="report-card-badge">Глубокий анализ</div>
+                </div>
+
+                <!-- SEO -->
+                <div class="report-card" onclick="openReportModal('seo')">
+                    <div class="report-card-icon">✍️</div>
+                    <div class="report-card-title">SEO оптимизация</div>
+                    <div class="report-card-desc">Новый заголовок, описание и ключевые слова</div>
+                    <div class="report-card-badge">Контент</div>
+                </div>
+
+                <!-- Сезонность -->
+                <div class="report-card" onclick="openReportModal('seasonal')">
+                    <div class="report-card-icon">📅</div>
+                    <div class="report-card-title">Сезонный анализ</div>
+                    <div class="report-card-desc">Пики спроса и динамика цен по месяцам</div>
+                    <div class="report-card-badge">DataLab</div>
+                </div>
+
+                <!-- Конкуренты -->
+                <div class="report-card" onclick="openReportModal('competitors')">
+                    <div class="report-card-icon">⚔️</div>
+                    <div class="report-card-title">Анализ конкурентов</div>
+                    <div class="report-card-desc">Топ товары, цены, количество отзывов</div>
+                    <div class="report-card-badge">Shopping</div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+</div>
+
+<!-- ─── МОДАЛЬНОЕ ОКНО ОТЧЁТА ─── -->
+<div id="report-modal" class="modal-overlay hidden" onclick="closeReportModal(event)">
+    <div class="modal-card">
+        <div class="modal-header">
+            <h2 class="modal-title" id="modal-title">Генерация отчёта</h2>
+            <button class="modal-close" onclick="closeReportModal()">✕</button>
+        </div>
+        <div class="modal-body">
+            <p class="modal-hint">Введите ключевое слово — агент соберёт данные из Naver и сгенерирует PDF</p>
+            <div class="field-group">
+                <label>Ключевое слово (на корейском или русском)</label>
+                <input type="text" id="report-keyword" placeholder="например: 보온병 или термос">
+            </div>
+            <div id="report-error" class="auth-error hidden"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="closeReportModal()">Отмена</button>
+            <button class="btn-primary" onclick="generateReport()" id="btn-generate">
+                Сгенерировать PDF
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ─── УВЕДОМЛЕНИЕ ─── -->
+<div id="toast" class="toast hidden"></div>
+
+<script src="chat.js"></script>
+</body>
+</html>

@@ -1,4 +1,7 @@
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
+from fastapi.middleware.cors import CORSMiddleware
+
 from contextlib import asynccontextmanager
 
 from qdrant_client import AsyncQdrantClient
@@ -31,7 +34,19 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="SmartStore AI Advisor", lifespan=lifespan)
 
+# Сначала middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(auth_router)
 app.include_router(chat_router)
 app.include_router(documents_router)
 app.include_router(reports_router)
+
+# StaticFiles
+app.mount("/", StaticFiles(directory="frontend", html=True), name="frontend")
