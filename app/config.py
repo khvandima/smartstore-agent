@@ -28,7 +28,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24 * 8
 
     # RAG параметры
-    EMBEDDING_MODEL: str = 'multilingual-e5-large'
+    EMBEDDING_MODEL: str = 'intfloat/multilingual-e5-large'
     CHUNK_SIZE: int = 500
     CHUNK_OVERLAP: int = 100
     VECTOR_SIZE: int = 1024
